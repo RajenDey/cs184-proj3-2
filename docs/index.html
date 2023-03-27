@@ -1,0 +1,150 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<style>
+  body {
+    padding: 100px;
+    width: 1000px;
+    margin: auto;
+    text-align: left;
+    font-weight: 300;
+    font-family: 'Open Sans', sans-serif;
+    color: #121212;
+  }
+  h1, h2, h3, h4 {
+    font-family: 'Source Sans Pro', sans-serif;
+  }
+</style>
+<title>CS 184 Project 2</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link href="https://fonts.googleapis.com/css?family=Open+Sans|Source+Sans+Pro" rel="stylesheet">
+</head>
+
+
+<body>
+
+<h1 align="middle">CS 184: Computer Graphics and Imaging, Spring 2023</h1>
+<h1 align="middle">Project 3-2</h1>
+<h2 align="middle">Rajen Dey, Eshaan Moorjani</h2>
+<h2 align="middle" href="http://rajendey.github.io/cs184-proj3-2">http://rajendey.github.io/cs184-proj3-2</h2>
+
+<br><br>
+
+<div>
+
+<h2 align="middle">Overview</h2>
+<p>
+  In part 1, we implemented BSDFs to represent reflection and refraction. We didn’t run into many issues in this part, as we just used the appropriate equations from the docs and the slides. One tricky part was calculating Schlick’s approximation, and we ran into an issue because we were using eta = ior1/ior2 instead of ior2/ior1 when trying to calculate R. In part 2, we implemented a thin lens. We didn’t run into any issues in this part, as we just followed the pseudocode in the docs. 
+</p>
+
+<h2 align="middle">Part 1: Mirror and Glass Materials</h2>
+
+<p> 
+Max Ray Depth 0: Only the light appears, because the object only get seen if light bounces off them which can’t happen with 0 bounces.
+</p>
+<br>
+<p> 
+Max Ray Depth 1: The spheres and walls show up because light can bounce off them into the camera
+</p>
+<br>
+<p> 
+Max Ray Depth 2: The light can now bounce from another object to the sphere, instead of coming directly from the light, so the left sphere now reflects light from other objects and the right sphere refracts. We can see the reflection of the right sphere inside the left sphere because of this.
+<br>
+<p> 
+Max Ray Depth 3: We can see a reflection of the left sphere inside the reflection of the right sphere in the left sphere. With 3 bounces, light can go from light source -> left sphere -> right sphere -> left sphere -> camera. The right sphere refracts light from the light source into its shadow, so now the center of its shadow is bright. This happens because the light can go from light source -> into right sphere -> out of right sphere -> ground -> camera.
+</p>
+<br>
+<p> 
+Max Ray Depth 4: The light from the bright spot in the right sphere's shadow reflects back up into the right sphere, which causes the bottom right part of it to be brighter. There is also now a bright spot in on the wall, perhaps also caused by the bright spot reflecting light.
+
+</p>
+<br>
+<p> 
+Max Ray Depth 5 and 100: not much visibly changes, but the scene becomes slightly brighter. 
+
+</p>
+<br>
+
+<div align="middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <img src="images/1-1.png" align="middle" width="800px"/>
+        <figcaption>max_ray_depth=0</figcaption><br><br><br>
+        <img src="images/1-2.png" align="middle" width="800px"/>
+        <figcaption>max_ray_depth=1</figcaption><br><br><br>
+        <img src="images/1-3.png" align="middle" width="800px"/>
+        <figcaption>max_ray_depth=2</figcaption><br><br><br>
+        <img src="images/1-4.png" align="middle" width="800px"/>
+        <figcaption>max_ray_depth=3</figcaption><br><br><br>
+        <img src="images/1-5.png" align="middle" width="800px"/>
+        <figcaption>max_ray_depth=4</figcaption><br><br><br>
+        <img src="images/1-6.png" align="middle" width="800px"/>
+        <figcaption>max_ray_depth=5</figcaption><br><br><br>
+        <img src="images/1-7.png" align="middle" width="800px"/>
+        <figcaption>max_ray_depth=100</figcaption><br><br><br>
+
+      </td>
+      <td>
+      </td>
+    </tr>
+    <br>
+    <tr>
+      <td>
+      </td>
+      <td>
+      </td>
+    </tr>
+  </table>
+</div>
+
+
+<h2 align="middle">Part 4: Depth of Field </h2>
+<br><br>
+<p>
+  We did part 1 and 4 of the project, so we unfortunately cannot use a microfacet BSDF :(. 
+
+  The pinhole camera model (with a diagram below) is when the scene you are trying to capture enters through a small hole where lightrays enter and recapture the image in a plane behind the hole. Usually, that plane is the camera sensor. Meanwhile, in the thin-lens model, light first hits a lens that transforms the light ray such that parts of the scene are “focused” (represented accurately) while other parts are out-of-focus (blurry). The primary difference is how light travels through each model. In the pinhole model, every light ray travels from a point in the scene into a point in the plane behind the hole. However, in the thin-lens model the light hits the lens first, causing a focusing effect on a specific part of the scene. 
+  
+</p>
+
+<div align="middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <img src="images/4-0.png" align="middle" width="800px"/>
+        <figcaption>Pinhole Diagram</figcaption><br><br><br>
+        <img src="images/4-1.png" align="middle" width="800px"/>
+        <figcaption>Focus Stack #1</figcaption><br><br><br>
+        <img src="images/4-2.png" align="middle" width="800px"/>
+        <figcaption>Focus Stack #2</figcaption><br><br><br>
+        <img src="images/4-3.png" align="middle" width="800px"/>
+        <figcaption>Focus Stack #3</figcaption><br><br><br>
+        <img src="images/4-4.png" align="middle" width="800px"/>
+        <figcaption>Focus Stack #4</figcaption><br><br><br>
+        <img src="images/4-5.png" align="middle" width="800px"/>
+        <figcaption>Aperature Sizes #1</figcaption><br><br><br>
+        <img src="images/4-6.png" align="middle" width="800px"/>
+        <figcaption>Aperature Sizes #2</figcaption><br><br><br>
+        <img src="images/4-7.png" align="middle" width="800px"/>
+        <figcaption>Aperature Sizes #3</figcaption><br><br><br>
+        <img src="images/4-8.png" align="middle" width="800px"/>
+        <figcaption>Aperature Sizes #4</figcaption><br><br><br>
+
+
+      </td>
+      <td>
+      </td>
+    </tr>
+    <br>
+    <tr>
+      <td>
+      </td>
+      <td>
+      </td>
+    </tr>
+  </table>
+</div>
+
+</body>
+</html>
